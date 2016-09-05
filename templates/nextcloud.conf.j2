@@ -1,0 +1,14 @@
+Alias /nextcloud "/opt/nextcloud/"
+
+<Directory /opt/nextcloud/>
+  Options +FollowSymlinks
+  AllowOverride All
+
+ <IfModule mod_dav.c>
+  Dav off
+ </IfModule>
+
+ SetEnv HOME /opt/nextcloud
+ SetEnv HTTP_HOME /opt/nextcloud
+
+</Directory>

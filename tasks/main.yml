@@ -1,0 +1,55 @@
+---
+# tasks file for .
+
+- name: install prerequsites
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items:
+  - apache2
+  - mariadb-server 
+  - libapache2-mod-php5
+  - php5-gd 
+  - php5-json 
+  - php5-curl
+  - php5-intl 
+  - php5-mcrypt 
+  - php5-imagick
+  - php5-pgsql
+
+- name: add apache modules
+  apache2_module: name="{{item}}" state=present
+  with_items:
+  - rewrite
+  - headers
+  - env
+  - dir
+  - mime
+
+
+- name: download nextcloud
+  get_url: url="https://download.nextcloud.com/server/releases/nextcloud-10.0.0.tar.bz2" dest="/tmp/nextcloud-10.0.0.tar.bz2"
+
+- name: check if installed
+  stat: path="/opt/nextcloud"
+  register: nextcloudDir
+
+- block:
+  - name: extract nextcloud
+    unarchive: src="/tmp/nextcloud-10.0.0.tar.bz2"  dest="/opt/" owner="www-data" group=www-data copy=no
+  - name: install site
+    template: src="nextcloud.conf.j2" dest=/etc/apache2/sites-enabled/nextcloud.conf
+
+  - name: install nextcloud
+    become: true
+    become_user: www-data
+    shell: 'cd /opt/nextcloud; php occ  maintenance:install --database "{{nextcloud_database}}" --database-name "{{nexcloud_database_name}}"  --database-user "{{nexcloud_database_user}}" --database-pass "{{nexcloud_database_pass}}" --admin-user "{{nexcloud_admin_user}}" --admin-pass "{{nextcloud_admin_pass}}"'
+
+  when: nextcloudDir.stat.exists == False
+
+- name: add domain as trusted
+  become: true
+  become_user: www-data
+  shell: "cd /opt/nextcloud; php occ config:system:set trusted_domains 1 --value={{nextcloud_domain}}"
+
+

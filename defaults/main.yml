@@ -1,0 +1,11 @@
+---
+# defaults file for .
+nextcloud_domain: "my.super.domain"
+nextcloud_admin_pass: "admin"
+nextcloud_database: "psql"
+nexcloud_database_name: "nextcloud"
+nexcloud_database_user: "nextcloud" 
+nexcloud_database_pass: "nextcloud"
+nexcloud_admin_user: "admin"
+nextcloud_admin_pass: "admin"
+
